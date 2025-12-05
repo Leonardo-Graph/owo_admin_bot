@@ -1,7 +1,6 @@
 # owo_bot.py
 # Requisiti: discord.py 2.x
 # pip install -U discord.py
-# Bot Token: MTQ0NjE4ODQ4NTU4NDM1NTMzMA.GDkkJr.26ydz21-U5qVbvUoVI2nTXtJQE4rl5L-Vk0Txg
 # Guild ID: 1445463044305059843
 
 import discord
@@ -9,13 +8,14 @@ from discord.ext import commands, tasks
 from discord import app_commands
 import json
 import asyncio
+import os
 from typing import Dict, List, Optional
 
 # ===========================
 # CONFIG - SOSTITUISCI GLI ID QUI
 # ===========================
 GUILD_ID = 1445463044305059843  # <- sostituisci con l'ID del server (int)
-BOT_TOKEN = "MTQ0NjE4ODQ4NTU4NDM1NTMzMA.GDkkJr.26ydz21-U5qVbvUoVI2nTXtJQE4rl5L-Vk0Txg"   # <- sostituisci con token bot
+BOT_TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Ruoli OWO: preferibile inserire gli ID (int). Se None, il bot userà il "name" per trovare/creare.
 ROLE_IDS = {
@@ -107,71 +107,37 @@ CHANNEL_OVERRIDES_DEF = {
 
     # CORE-NET
     "sys-announcements": {"allow": ["Initiate","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["silenced"]},
-    "user-handshake": {"allow": ["Initiate","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["silenced"]},
-    "support-desk": {"allow": ["Initiate","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["silenced"]},
-    "firewall-foes": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], 
-                      "deny":["Initiate","Verified","silenced"]},
+    "user-handshake":  {"allow": ["Initiate","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["silenced"]},
+    "support-desk":    {"allow": ["Initiate","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["silenced"]},
+    "firewall-foes":   {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
 
     # OPS-NET
-    "main-terminal": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                      "deny":["Initiate","Verified","silenced"]},
-
-    "tactics-node": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                     "deny":["Initiate","Verified","silenced"]},
-
-    "capture-logs": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                     "deny":["Initiate","Verified","silenced"]},
-
-    "media": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-              "deny":["Initiate","Verified","silenced"]},
-
-    "resource-vault": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                       "deny":["Initiate","Verified","silenced"]},
-    
-    "logs-archive": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                     "deny":["Initiate","Verified","silenced"]},
-
+    "main-terminal":   {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "tactics-node":    {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "capture-logs":    {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "resource-vault":  {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "logs-archive":    {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "media":           {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
 
     # ECON-NET
-    "quota-directives": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                         "deny":["Initiate","Verified","silenced"]},
-    "quota-reports": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                      "deny":["Initiate","Verified","silenced"]},
-    "fund-ledger": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                    "deny":["Initiate","Verified","silenced"]},
+    "quota-directives": {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "quota-reports":    {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "fund-ledger":      {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
 
     # SYS-TOOLS (restricted)
-    "bot-shell": {"allow": ["SuperUser","Council-Core","Root Access","sys-bot"],
-                  "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","silenced","CyberNet"]},
-
-    "web-status": {"allow": ["SuperUser","Council-Core","Root Access","sys-bot"],
-                   "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","silenced","CyberNet"]},
-
-    "log-channel": {"allow": ["sys-bot","Root Access","Council-Core"],
-                    "deny":["Initiate","Verified","CyberNet","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced"]},
+    "bot-shell":   {"allow": ["SuperUser","Council-Core","Root Access","sys-bot"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","silenced","CyberNet"]},
+    "web-status":  {"allow": ["SuperUser","Council-Core","Root Access","sys-bot"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","silenced","CyberNet"]},
 
     # VOICE-OPS
-    "ops-channel": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-                    "deny":["Initiate","Verified","silenced"]},
-
-    "lounge": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-               "deny":["Initiate","Verified","silenced"]},
-
-    "afk": {"allow": ["Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"],
-            "deny":["Initiate","Verified","silenced"]},
+    "ops-channel": {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "lounge":      {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
+    "afk":         {"allow": ["Initiate","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","Council-Core","Root Access"], "deny":["Verified","silenced"]},
 
     # COUNCIL - only Council-Core + Root
-    "applications-review": {"allow": ["Council-Core","Root Access"],
-                            "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
-
-    "council-chat": {"allow": ["Council-Core","Root Access"],
-                     "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
-
-    "ticket-logs": {"allow": ["Council-Core","Root Access"],
-                    "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
-
-    "council-lounge": {"allow": ["Council-Core","Root Access"],
-                       "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
+    "applications-review": {"allow": ["Council-Core","Root Access"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
+    "council-chat":        {"allow": ["Council-Core","Root Access"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
+    "ticket-logs":         {"allow": ["Council-Core","Root Access"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
+    "council-lounge":      {"allow": ["Council-Core","Root Access"], "deny":["Initiate","Verified","Kernel-Operative","Senior-Node","Node-Operative","Field-Agent","SuperUser","silenced","CyberNet"]},
 }
 
 # ===========================
